@@ -1,12 +1,10 @@
 from openai import OpenAI
 import os
-from dotenv import load_dotenv
 import base64
 import streamlit as st
 from elevenlabs import generate, play, save, voices, Voice, VoiceSettings
 from elevenlabs.api.error import UnauthenticatedRateLimitError, RateLimitError
 
-load_dotenv()
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 eleven_labs_api_key = st.secrets["ELEVEN_LABS_API_KEY"]
 
