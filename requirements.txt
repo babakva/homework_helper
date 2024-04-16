@@ -1,0 +1,5 @@
+streamlit
+openai
+streamlit_float
+audio_recorder_streamlit
+elevenlabs
