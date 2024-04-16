@@ -2,13 +2,14 @@ from openai import OpenAI
 import os
 import base64
 import streamlit as st
-from elevenlabs import generate, play, save, voices, Voice, VoiceSettings
-from elevenlabs.api.error import UnauthenticatedRateLimitError, RateLimitError
+from elevenlabs import play, save, voices, Voice, VoiceSettings
+from elevenlabs.client import ElevenLabs
 
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 eleven_labs_api_key = st.secrets["ELEVEN_LABS_API_KEY"]
 
-client = OpenAI(api_key=openai_api_key)
+open_ai_client = OpenAI(api_key=openai_api_key)
+eleven_labs_client = ElevenLabs(api_key=eleven_labs_api_key)
 
 def get_answer(messages):
     system_message = [{"role": "system", "content": "Du är en läxhjälp assistent som ska hjälpa mitt barn med läxor. Din uppgift är att ställa frågor om ett specifikt ämne och sen hjälpa mitt barn att svara rätt genom att ge ledtrådar, frågorna får vara på nivån för en person som är 12 år."},
@@ -16,7 +17,7 @@ def get_answer(messages):
     {"role": "system", "content": "Kom ihåg att det är du som hittar på frågor om ämnet och användaren svarar."}]
 
     messages = system_message + messages
-    response = client.chat.completions.create(
+    response = open_ai_client.chat.completions.create(
         model="gpt-3.5-turbo-1106",
         messages=messages
     )
@@ -24,7 +25,7 @@ def get_answer(messages):
 
 def speech_to_text(audio_data):
     with open(audio_data, "rb") as audio_file:
-        transcript = client.audio.transcriptions.create(
+        transcript = open_ai_client.audio.transcriptions.create(
             model="whisper-1",
             response_format="text",
             file=audio_file,
@@ -34,20 +35,11 @@ def speech_to_text(audio_data):
 
 def text_to_speech(input_text):
     webm_file_path = "temp_audio_play.mp3"
-    try:
-        audio = generate(text=input_text, voice=Voice(
+    audio = eleven_labs_client.generate(text=input_text, voice=Voice(
         voice_id='kOxuP8FgNUeapEbiIgBZ',
         settings=VoiceSettings(stability=0.8, similarity_boost=0.75, style=0.0, use_speaker_boost=True)),
-        model='eleven_multilingual_v2', api_key=eleven_labs_api_key)
-        play(audio)
-    except UnauthenticatedRateLimitError:
-        e = UnauthenticatedRateLimitError("Unauthenticated Rate Limit Error")
-        print(e)
-        st.exception(e)
-    except RateLimitError:
-        e = RateLimitError('Rate Limit')
-        print(e)
-        st.exception(e)
+        model='eleven_multilingual_v2')
+    play(audio)
 
 def handle_errors(func, *args, **kwargs):
     try:
