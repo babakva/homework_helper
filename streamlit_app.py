@@ -9,6 +9,24 @@ st.set_page_config(page_title="🧑‍💻 Läxhjälpsbotten 💬", page_icon=""
 
 float_init()
 
+homework = {
+  "jupiter": [
+      "Vad är Jupiter känd för att vara inom solsystemet? (Stor, ljus, med mera.)",
+      "Kan du nämna någon av jupiters månar?",
+      "Vad är den röda fläcken på Jupiter?"
+  ],
+  "cesar": [
+      "Vad var Julius Caesars kända uttryck när han korsade floden Rubicon?",
+      "Vad hette Julius Caesars adoptivson, som också blev kejsare?",
+      "Vilket är den berömda romerska byggnaden som kallas för Julius Caesars sista viloplats?"
+  ],
+  "ronja": [
+      "Vad heter Ronjas rövarpappa?",
+      "Var bor Ronja Rövardotter?",
+      "Vilken sorts varelse är Birk i boken?"
+  ]
+}
+
 def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = [
@@ -91,6 +109,21 @@ if st.session_state.messages[-1]["role"] != "assistant":
         with st.spinner("Låt mig tänka🤔..."):
             final_response = get_answer(st.session_state.messages)
         with st.spinner("..."):    
-            audio_file = text_to_speech(final_response)
+            audio = text_to_speech(final_response)
+            if audio:
+              autoplay_audio(audio)
         st.write(final_response)
         st.session_state.messages.append({"role": "assistant", "content": final_response})
+def autoplay_audio(file_path: str):
+    with open(file_path, "rb") as f:
+        data = f.read()
+        b64 = base64.b64encode(data).decode()
+        md = f"""
+            <audio controls autoplay="true">
+            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
+            """
+        st.markdown(
+            md,
+            unsafe_allow_html=True,
+        )

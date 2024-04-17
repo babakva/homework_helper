@@ -34,12 +34,14 @@ def speech_to_text(audio_data):
     return transcript
 
 def text_to_speech(input_text):
-    webm_file_path = "temp_audio_play.mp3"
+    response_audio_path = 'temp_response.mp3'
     audio = eleven_labs_client.generate(text=input_text, voice=Voice(
         voice_id='kOxuP8FgNUeapEbiIgBZ',
         settings=VoiceSettings(stability=0.8, similarity_boost=0.75, style=0.0, use_speaker_boost=True)),
         model='eleven_multilingual_v2')
-    play(audio)
+    save(audio, response_audio_path)
+    return(response_audio_path)
+
 
 def handle_errors(func, *args, **kwargs):
     try:
@@ -51,16 +53,6 @@ def handle_errors(func, *args, **kwargs):
         st.error("Ett fel uppstod. Försök igen senare.")
         # Return a default value (optional)
         return None
-
-def prepare_response(get_answer_func, user_input):
-    with st.spinner("Låt mig tryänka..."):
-        response = handle_errors(get_answer_func, st.session_state.messages, user_input)
-    audio_file = None
-    if response:
-        with st.spinner("..."):
-            audio_file = handle_errors(text_to_speech, response)
-    return response, audio_file
-
 
 def autoplay_audio(file_path: str):
     with open(file_path, "rb") as f:
