@@ -29,6 +29,16 @@ homework = {
   ]
 }
 
+with st.sidebar:
+  st.page_link('streamlit_app.py', label='Läxor')
+  st.page_link('pages/parent.py', label='Förälderadmin')
+  st.divider()
+  if st.button(':page_facing_up: Ladda upp egen läxa',  use_container_width=True):
+    st.write('När denna funktion är utvecklat kommer du komma ladda upp din egen läxa och AIn kommer skapa frågor till dig baserat på din årskurs.')
+  if st.button(':camera: Fota matteläxa',  use_container_width=True):
+    st.write('När denna funktion är utvecklat kommer du kunna ta bild på din matteläxa och få hjälp att lösa den.')
+
+
 def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = [
@@ -97,12 +107,6 @@ with footer_container:
 # Float the footer container and provide CSS to target it with
 footer_container.float("bottom: 0rem;")
 
-
-with st.sidebar:
-    if st.button(':page_facing_up: Ladda upp egen läxa',  use_container_width=True):
-        st.write('När denna funktion är utvecklat kommer du komma ladda upp din egen läxa och AIn kommer skapa frågor till dig baserat på din årskurs.')
-    if st.button(':camera: Fota matteläxa',  use_container_width=True):
-        st.write('När denna funktion är utvecklat kommer du kunna ta bild på din matteläxa och få hjälp att lösa den.')
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
